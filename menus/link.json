@@ -2,8 +2,14 @@
   "context-menu": {
     "atom-text-editor .syntax--markup.syntax--underline.syntax--link": [
       {
-        "label": "Open link",
+        "type": "separator"
+      },
+      {
+        "label": "Open Link",
         "command": "link:open"
+      },
+      {
+        "type": "separator"
       }
     ]
   }
