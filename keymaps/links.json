@@ -1,5 +1,11 @@
 {
-  ".platform-darwin atom-text-editor": {
-    "ctrl-shift-o": "link:open"
+  // One binding for all three platforms. It used to be `.platform-darwin`
+  // only, so link:open had no keystroke at all on Windows or Linux — and
+  // ctrl-shift-o is core's application:open-folder there, which an editor-scoped
+  // binding would have taken. cmdorctrl-alt-o is free everywhere.
+  //
+  // :not([mini]) because it opens the link under the cursor in the file.
+  "atom-text-editor:not([mini])": {
+    "cmdorctrl-alt-o": "link:open"
   }
 }
