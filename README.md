@@ -13,7 +13,7 @@ To install `link` search for _link_ in the Install pane of the Lumine settings o
 
 ## Commands
 
-Commands available in `atom-text-editor`:
+Commands available in `lumine-text-editor`:
 
 - `link:open`: open the http(s) link under the cursor.
 

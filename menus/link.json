@@ -1,6 +1,6 @@
 {
   "context-menu": {
-    "atom-text-editor .syntax--markup.syntax--underline.syntax--link": [
+    "lumine-text-editor .syntax--markup.syntax--underline.syntax--link": [
       {
         "type": "separator"
       },

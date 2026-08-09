@@ -5,7 +5,7 @@
   // binding would have taken. cmdorctrl-alt-o is free everywhere.
   //
   // :not([mini]) because it opens the link under the cursor in the file.
-  "atom-text-editor:not([mini])": {
+  "lumine-text-editor:not([mini])": {
     "cmdorctrl-alt-o": "link:open"
   }
 }
