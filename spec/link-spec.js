@@ -28,14 +28,14 @@ describe("link package", () => {
       expect(lumine.shell.openExternal).toHaveBeenCalled();
       expect(lumine.shell.openExternal.calls.argsFor(0)[0]).toBe("http://github.com");
 
-      lumine.shell.openExternal.reset();
+      lumine.shell.openExternal.calls.reset();
       editor.setCursorBufferPosition([0, 8]);
       lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
 
       expect(lumine.shell.openExternal).toHaveBeenCalled();
       expect(lumine.shell.openExternal.calls.argsFor(0)[0]).toBe("http://github.com");
 
-      lumine.shell.openExternal.reset();
+      lumine.shell.openExternal.calls.reset();
       editor.setCursorBufferPosition([0, 20]);
       lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
 
@@ -77,7 +77,7 @@ you should not [click][her]
         expect(lumine.shell.openExternal).toHaveBeenCalled();
         expect(lumine.shell.openExternal.calls.argsFor(0)[0]).toBe("http://github.com");
 
-        lumine.shell.openExternal.reset();
+        lumine.shell.openExternal.calls.reset();
         editor.setCursorBufferPosition([1, 24]);
         lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
 
