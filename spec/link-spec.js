@@ -26,63 +26,27 @@ describe("link package", () => {
       lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
 
       expect(lumine.shell.openExternal).toHaveBeenCalled();
-      expect(lumine.shell.openExternal.argsForCall[0][0]).toBe("http://github.com");
+      expect(lumine.shell.openExternal.calls.argsFor(0)[0]).toBe("http://github.com");
 
       lumine.shell.openExternal.reset();
       editor.setCursorBufferPosition([0, 8]);
       lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
 
       expect(lumine.shell.openExternal).toHaveBeenCalled();
-      expect(lumine.shell.openExternal.argsForCall[0][0]).toBe("http://github.com");
+      expect(lumine.shell.openExternal.calls.argsFor(0)[0]).toBe("http://github.com");
 
       lumine.shell.openExternal.reset();
       editor.setCursorBufferPosition([0, 20]);
       lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
 
       expect(lumine.shell.openExternal).toHaveBeenCalled();
-      expect(lumine.shell.openExternal.argsForCall[0][0]).toBe("http://github.com");
+      expect(lumine.shell.openExternal.calls.argsFor(0)[0]).toBe("http://github.com");
     });
 
-    // NOTE: I don't think anyone realized that this was a feature. Our
-    // `tree-sitter-markdown` parser doesn't recognize these as URLs. We'd need
-    // our custom `tree-sitter-hyperlink` to support this, and it doesn't right
-    // now, but I'll keep it in mind for the future.
-    xit("opens a 'lumine:' link", async () => {
-      await lumine.workspace.open("sample.md");
-
-      const editor = lumine.workspace.getActiveTextEditor();
-      editor.setText("// lumine://core/open/file?filename=sample.js&line=1&column=2 ");
-
-      spyOn(lumine.shell, "openExternal");
-      lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
-      expect(lumine.shell.openExternal).not.toHaveBeenCalled();
-
-      editor.setCursorBufferPosition([0, 4]);
-      lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
-
-      expect(lumine.shell.openExternal).toHaveBeenCalled();
-      expect(lumine.shell.openExternal.argsForCall[0][0]).toBe(
-        "lumine://core/open/file?filename=sample.js&line=1&column=2",
-      );
-
-      lumine.shell.openExternal.reset();
-      editor.setCursorBufferPosition([0, 8]);
-      lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
-
-      expect(lumine.shell.openExternal).toHaveBeenCalled();
-      expect(lumine.shell.openExternal.argsForCall[0][0]).toBe(
-        "lumine://core/open/file?filename=sample.js&line=1&column=2",
-      );
-
-      lumine.shell.openExternal.reset();
-      editor.setCursorBufferPosition([0, 59]);
-      lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
-
-      expect(lumine.shell.openExternal).toHaveBeenCalled();
-      expect(lumine.shell.openExternal.argsForCall[0][0]).toBe(
-        "lumine://core/open/file?filename=sample.js&line=1&column=2",
-      );
-    });
+    // No spec for a `lumine:` URL: neither `tree-sitter-markdown` nor
+    // `tree-sitter-hyperlink` tokenizes one as a link, so `link:open` never
+    // sees it. Restoring this needs the hyperlink grammar to recognise the
+    // scheme first.
 
     describe("when the cursor is on a [name][url-name] style markdown link", () =>
       it("opens the named url", async () => {
@@ -111,7 +75,7 @@ you should not [click][her]
         lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
 
         expect(lumine.shell.openExternal).toHaveBeenCalled();
-        expect(lumine.shell.openExternal.argsForCall[0][0]).toBe("http://github.com");
+        expect(lumine.shell.openExternal.calls.argsFor(0)[0]).toBe("http://github.com");
 
         lumine.shell.openExternal.reset();
         editor.setCursorBufferPosition([1, 24]);
