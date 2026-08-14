@@ -9,7 +9,7 @@ Open the http(s) link under the cursor in your default browser.
 
 ## Installation
 
-To install `link` search for _link_ in the Install pane of the Lumine settings or run `lumine --install lumine-code/link`.
+To install `link` search for it in the Install pane of the Lumine settings, or run the command `lumine --install lumine-code/link`.
 
 ## Commands
 
