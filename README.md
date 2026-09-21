@@ -13,7 +13,7 @@ To install `link` search for it in the Install pane of the Lumine settings, or r
 
 ## Commands
 
-Commands available in `lumine-text-editor`:
+Commands available in `lumine-text-editor:not([mini])`:
 
 - `link:open`: open the http(s) link under the cursor.
 
