@@ -1,10 +1,6 @@
-const path = require("path");
-
-const languageHyperlinkRoot = path.join(__dirname, "..", "..", "language-hyperlink");
-
 describe("link package", () => {
   beforeEach(async () => {
-    await lumine.packages.activatePackage(languageHyperlinkRoot);
+    await lumine.packages.activatePackage("language-hyperlink");
     await lumine.packages.activatePackage("language-gfm");
 
     const activationPromise = lumine.packages.activatePackage("link");
