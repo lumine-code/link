@@ -25,7 +25,8 @@
     "lumine": "^1.0.0"
   },
   "specPackages": [
-    "language-hyperlink"
+    "language-hyperlink",
+    "hyperclick"
   ],
   "scripts": {
     "test": "lumine --test spec",
@@ -34,6 +35,11 @@
     "format:check": "prettier --check ."
   },
   "providedServices": {
+    "hyperclick.provider": {
+      "versions": {
+        "1.0.0": "provideHyperclick"
+      }
+    },
     "background-tips.provider": {
       "versions": {
         "1.0.0": "provideBackgroundTips"
