@@ -45,14 +45,12 @@ describe("link hyperclick provider", () => {
     expect(registration.provider.getSuggestionForWord).toEqual(jasmine.any(Function));
   });
 
-  it("offers the whole URL from its protocol, domain, and path words", async () => {
+  it("offers the whole URL from its protocol, domain, path, and query words", async () => {
     const url = "https://example.com/path?q=1";
-    // The hyperlink grammar currently truncates queries before trailing prose.
-    // At end of line it recognizes the whole URL, including its query string.
-    const editor = await openEditor(`before ${url}`);
+    const editor = await openEditor(`before ${url} after`);
     const expectedRange = new Range([0, 7], [0, 7 + url.length]);
 
-    for (const text of ["https", "example", "path"]) {
+    for (const text of ["https", "example", "path", "q", "1"]) {
       const suggestion = await query(editor, text);
       expect(suggestion).toBeDefined();
       expect(suggestion.range).toEqual(expectedRange);
@@ -61,6 +59,7 @@ describe("link hyperclick provider", () => {
       expect(lumine.shell.openExternal).toHaveBeenCalledOnceWith(url);
       lumine.shell.openExternal.calls.reset();
     }
+    expect(await query(editor, "after")).toBeUndefined();
   });
 
   it("opens the offered link when the cursor and active editor point elsewhere", async () => {
