@@ -19,7 +19,6 @@
   "files": [
     "keymaps",
     "lib",
-    "menus",
     "spec"
   ],
   "engines": {

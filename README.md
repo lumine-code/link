@@ -6,6 +6,7 @@ Open the http(s) link under the cursor in your default browser.
 
 - **Open links**: open the http(s) link under the cursor without leaving the editor.
 - **Cursor aware**: detects the link at the current cursor position in any editor.
+- **Context menu**: opens the link at the right-click position without moving the cursor.
 
 ## Installation
 
@@ -15,7 +16,7 @@ To install `link` search for it in the Install pane of the Lumine settings, or r
 
 Commands available in `lumine-text-editor:not([mini])`:
 
-- `link:open`: open the http(s) link under the cursor.
+- `link:open`: open the clicked http(s) link from its context menu or the link under the cursor.
 
 ## Contributing
 
