@@ -2,6 +2,8 @@
 
 Open the http(s) link under the cursor in your default browser.
 
+Fork of [pulsar-edit/pulsar](https://github.com/pulsar-edit/pulsar) (`packages/link`).
+
 ## Features
 
 - **Open links**: open the http(s) link under the cursor without leaving the editor.
