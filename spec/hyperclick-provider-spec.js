@@ -202,6 +202,19 @@ describe("link hyperclick provider", () => {
     expect(mainModule.urlForLink(editor, "some docs")).toBe("https://example.com/docs");
   });
 
+  for (const [context, definition] of [
+    ["ordinary indentation", '   [here]: https://example.com/docs "Title"'],
+    ["a list container", '- container\n\n    [here]: https://example.com/docs "Title"'],
+  ]) {
+    it(`resolves reference definitions with ${context}`, async () => {
+      const editor = await openEditor(`[click][here]\n\n${definition}`);
+
+      await (await query(editor, "here")).callback();
+
+      expect(lumine.shell.openExternal).toHaveBeenCalledOnceWith("https://example.com/docs");
+    });
+  }
+
   it("resolves the current destination synchronously while its syntax tree is pending", async () => {
     const editor = await openEditor("[click][here]\n\n[here]: https://old.example");
     editor.setText('[click][here]\n\n[here]: <https://new.example/my docs> "New title"');
