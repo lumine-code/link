@@ -100,6 +100,128 @@ describe("link hyperclick provider", () => {
     expect(lumine.shell.openExternal).toHaveBeenCalledOnceWith("http://example.com/");
   });
 
+  for (const [form, definition, expected] of [
+    ["double-quoted title", 'https://example.com/docs "Documentation"', "https://example.com/docs"],
+    ["single-quoted title", "https://example.com/docs 'Documentation'", "https://example.com/docs"],
+    ["parenthesized title", "https://example.com/docs (Documentation)", "https://example.com/docs"],
+    ["angle destination", "<https://example.com/docs>", "https://example.com/docs"],
+    ["escaped angle", String.raw`<https://example.com/a\>b>`, "https://example.com/a%3Eb"],
+    [
+      "spaces inside angles",
+      '<https://example.com/my docs> "Documentation"',
+      "https://example.com/my%20docs",
+    ],
+    [
+      "balanced parentheses",
+      'https://example.com/a(b(c)) "Documentation"',
+      "https://example.com/a(b(c))",
+    ],
+    [
+      "escaped parentheses",
+      String.raw`https://example.com/a\(b\) "Documentation"`,
+      "https://example.com/a(b)",
+    ],
+    ["character references", "https://example.com/?a=1&amp;b=2", "https://example.com/?a=1&b=2"],
+    ["semicolon reference", "https://example.com/a&semi;b", "https://example.com/a;b"],
+    ["numeric reference", "https://example.com/a&#59;b", "https://example.com/a;b"],
+    [
+      "unknown character reference",
+      "https://example.com/?a=&notit;",
+      "https://example.com/?a=&notit;",
+    ],
+    [
+      "escaped character reference",
+      String.raw`https://example.com/?a=1\&amp;b=2`,
+      "https://example.com/?a=1&amp;b=2",
+    ],
+    [
+      "multiline title",
+      'https://example.com/docs "Documentation\non another line"',
+      "https://example.com/docs",
+    ],
+  ]) {
+    it(`opens only the named reference destination with ${form}`, async () => {
+      const editor = await openEditor(`[click][here]\n\n[here]: ${definition}`);
+      const suggestion = await query(editor, "here");
+
+      expect(suggestion).toBeDefined();
+      await suggestion.callback();
+      expect(lumine.shell.openExternal).toHaveBeenCalledOnceWith(expected);
+
+      lumine.shell.openExternal.calls.reset();
+      editor.setCursorBufferPosition([0, 9]);
+      lumine.commands.dispatch(editor.getElement(), "link:open");
+      expect(lumine.shell.openExternal).toHaveBeenCalledOnceWith(expected);
+    });
+  }
+
+  it("matches reference labels without case sensitivity and uses the first definition", async () => {
+    const editor = await openEditor(
+      "[click][HeRe]\n\n[here]: https://first.example\n[HERE]: https://second.example",
+    );
+
+    await (await query(editor, "HeRe")).callback();
+
+    expect(lumine.shell.openExternal).toHaveBeenCalledOnceWith("https://first.example/");
+  });
+
+  it("ignores reference-shaped text inside fenced code blocks", async () => {
+    const editor = await openEditor(
+      "[click][here]\n\n```\n[here]: https://wrong.example\n```\n\n[here]: https://right.example",
+    );
+
+    await (await query(editor, "here")).callback();
+
+    expect(lumine.shell.openExternal).toHaveBeenCalledOnceWith("https://right.example/");
+  });
+
+  it("declines malformed or nonexistent named destinations", async () => {
+    const editor = await openEditor(
+      "[click][here]\n\n[here]: https://example.com/unbalanced(\n[space]: https://example.com/a b",
+    );
+
+    expect(mainModule.urlForLink(editor, "here")).toBeUndefined();
+    expect(mainModule.urlForLink(editor, "space")).toBeUndefined();
+    expect(mainModule.urlForLink(editor, "missing")).toBeUndefined();
+  });
+
+  it("does not resolve a reference defined only inside an injected Markdown code fence", async () => {
+    const editor = await openEditor(
+      "[click][here]\n\n```markdown\n[here]: https://wrong.example\n```",
+    );
+
+    expect(mainModule.urlForLink(editor, "here")).toBeUndefined();
+    expect(await query(editor, "here")).toBeUndefined();
+  });
+
+  it("normalizes spacing in reference labels", async () => {
+    const editor = await openEditor(
+      "[click][some docs]\n\n[some   docs]: https://example.com/docs",
+    );
+
+    expect(mainModule.urlForLink(editor, "some docs")).toBe("https://example.com/docs");
+  });
+
+  it("resolves the current destination synchronously while its syntax tree is pending", async () => {
+    const editor = await openEditor("[click][here]\n\n[here]: https://old.example");
+    editor.setText('[click][here]\n\n[here]: <https://new.example/my docs> "New title"');
+
+    expect(mainModule.urlForLink(editor, "here")).toBe("https://new.example/my%20docs");
+  });
+
+  it("resolves destination escapes synchronously when syntax nodes are unavailable", async () => {
+    const editor = await openEditor(String.raw`[click][here]
+
+[here]: https://example.com/a\(b\) "Documentation"`);
+    spyOn(editor.getBuffer().getLanguageMode(), "getSyntaxNodeAtPosition").and.returnValue(null);
+
+    expect(mainModule.urlForLink(editor, "here")).toBe("https://example.com/a(b)");
+    expect(mainModule.urlForLink(editor, "missing")).toBeUndefined();
+    expect(mainModule.urlForLink(editor, "https://example.com/plain")).toBe(
+      "https://example.com/plain",
+    );
+  });
+
   it("preserves mailto links recognized by the Markdown grammar", async () => {
     const editor = await openEditor("<mailto:hello@example.com>");
     const suggestion = await query(editor, "hello");
