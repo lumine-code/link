@@ -21,6 +21,10 @@ Commands available in `lumine-text-editor:not([mini])`:
 
 - `link:open`: open the clicked http(s) link from its context menu or the link under the cursor.
 
+## Usage
+
+Recognized HTTP(S) links open in the default browser, and `mailto:` links open in the default mail application. Install [hyperclick](https://github.com/lumine-code/hyperclick#readme) for pointer navigation; named Markdown references resolve to their complete link targets.
+
 ## Services
 
 - `hyperclick.provider`: provided to Hyperclick to underline and follow recognized links.
