@@ -11,6 +11,8 @@ Fork of [pulsar-edit/pulsar](https://github.com/pulsar-edit/pulsar) (`packages/l
 - **Context menu**: opens the link at the right-click position without moving the cursor.
 - **Hyperclick**: provides complete link ranges and browser actions to Hyperclick, including named Markdown references.
 
+![Recognize a documentation URL as a clickable link in the editor.](.github/demo.png)
+
 ## Installation
 
 To install `link` search for it in the Install pane of the Lumine settings, or run the command `lumine --install lumine-code/link`.
