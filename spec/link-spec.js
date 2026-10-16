@@ -102,6 +102,23 @@ describe("link package", () => {
   });
 
   describe("when the cursor is on a link", () => {
+    it("does not borrow an active editor for an explicit non-editor target", async () => {
+      const editor = await lumine.workspace.open("sample.md");
+      const languageMode = editor.getBuffer().getLanguageMode();
+      await languageMode.ready;
+      editor.setText("https://example.com");
+      await languageMode.atTransactionEnd();
+      editor.setCursorBufferPosition([0, 8]);
+      const main = lumine.packages.getActivePackage("link").mainModule;
+      spyOn(main, "openUrl").and.resolveTo();
+
+      await main.openLink({ target: lumine.workspace.getElement() });
+
+      expect(main.openUrl).not.toHaveBeenCalled();
+      expect(lumine.commands.canDispatch(editor.getElement(), "link:open")).toBe(true);
+      expect(lumine.commands.canDispatch(lumine.workspace.getElement(), "link:open")).toBe(false);
+    });
+
     it("opens the link using the 'open' command", async () => {
       await lumine.workspace.open("sample.md");
 
