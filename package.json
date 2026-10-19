@@ -2,10 +2,12 @@
   "name": "link",
   "author": "lumine-code",
   "version": "1.0.0",
-  "description": "Open the http(s) link under the cursor in your default browser.",
+  "description": "Open web links in the browser and Markdown file links in the editor.",
   "keywords": [
+    "markdown",
     "url",
     "hyperlink",
+    "navigation",
     "browser",
     "http",
     "https"
@@ -27,6 +29,7 @@
   },
   "specPackages": [
     "language-hyperlink",
+    "language-gfm",
     "hyperclick"
   ],
   "scripts": {

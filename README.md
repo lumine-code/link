@@ -1,15 +1,16 @@
 # link
 
-Open the http(s) link under the cursor in your default browser.
+Open web links in the browser and Markdown file links in the editor.
 
 Fork of [pulsar-edit/pulsar](https://github.com/pulsar-edit/pulsar) (`packages/link`).
 
 ## Features
 
 - **Open links**: open the http(s) link under the cursor without leaving the editor.
+- **Markdown files**: open relative paths, absolute paths and file URLs in the editor.
 - **Cursor aware**: detects the link at the current cursor position in any editor.
 - **Context menu**: opens the link at the right-click position without moving the cursor.
-- **Hyperclick**: provides complete link ranges and browser actions to Hyperclick, including named Markdown references.
+- **Hyperclick**: provides complete link ranges and navigation actions to Hyperclick, including named Markdown references.
 
 ![Recognize a documentation URL as a clickable link in the editor.](.github/demo.png)
 
@@ -21,16 +22,18 @@ To install `link` search for it in the Install pane of the Lumine settings, or r
 
 Commands available in `lumine-text-editor:not([mini])`:
 
-- `link:open`: open the clicked http(s) link from its context menu or the link under the cursor.
+- `link:open`: open the clicked link from its context menu or the link under the cursor.
 
 ## Usage
 
 Recognized HTTP(S) links open in the default browser, and `mailto:` links open in the default mail application. Install [hyperclick](https://github.com/lumine-code/hyperclick#readme) for pointer navigation; named Markdown references resolve to their complete link targets.
 
+Markdown file links such as `[documentation](docs/guide.md)` open existing files in the editor. Relative paths start from the directory of the saved Markdown document; absolute paths and `file:///` URLs also work. URL-encoded filenames are decoded, and query strings and fragments are excluded from the filename. Missing files produce a warning instead of creating an empty file. A filename in ordinary prose or quotes is not treated as a link.
+
 ## Services
 
 - `hyperclick.provider`: provided to Hyperclick to underline and follow recognized links.
-- `background-tips.provider`: provided to show a tip about opening links in the browser.
+- `background-tips.provider`: provided to show a tip about opening web and Markdown file links.
 
 ## Contributing
 
