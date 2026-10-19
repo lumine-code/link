@@ -60,6 +60,7 @@ describe("Markdown file links", () => {
     ],
     ["absolute", `[integration](<${targetPath}>)`, "tree", targetPath],
     ["file URL", `[draft](${pathToFileURL(encodedPath).href})`, "guide", encodedPath],
+    ["file autolink", `<${pathToFileURL(encodedPath).href}>`, "guide", encodedPath],
   ]) {
     it(`opens a ${name} destination in the editor`, async () => {
       const editor = await openEditor(
