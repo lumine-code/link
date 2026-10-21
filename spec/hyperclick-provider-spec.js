@@ -150,7 +150,7 @@ describe("link hyperclick provider", () => {
 
       lumine.shell.openExternal.calls.reset();
       editor.setCursorBufferPosition([0, 9]);
-      lumine.commands.dispatch(editor.getElement(), "link:open");
+      await lumine.commands.dispatch(editor.getElement(), "link:open");
       expect(lumine.shell.openExternal).toHaveBeenCalledOnceWith(expected);
     });
   }
@@ -180,9 +180,9 @@ describe("link hyperclick provider", () => {
       "[click][here]\n\n[here]: https://example.com/unbalanced(\n[space]: https://example.com/a b",
     );
 
-    expect(mainModule.urlForLink(editor, "here")).toBeUndefined();
-    expect(mainModule.urlForLink(editor, "space")).toBeUndefined();
-    expect(mainModule.urlForLink(editor, "missing")).toBeUndefined();
+    expect(await mainModule.urlForLink(editor, "here")).toBeUndefined();
+    expect(await mainModule.urlForLink(editor, "space")).toBeUndefined();
+    expect(await mainModule.urlForLink(editor, "missing")).toBeUndefined();
   });
 
   it("does not resolve a reference defined only inside an injected Markdown code fence", async () => {
@@ -190,7 +190,7 @@ describe("link hyperclick provider", () => {
       "[click][here]\n\n```markdown\n[here]: https://wrong.example\n```",
     );
 
-    expect(mainModule.urlForLink(editor, "here")).toBeUndefined();
+    expect(await mainModule.urlForLink(editor, "here")).toBeUndefined();
     expect(await query(editor, "here")).toBeUndefined();
   });
 
@@ -199,7 +199,7 @@ describe("link hyperclick provider", () => {
       "[click][some docs]\n\n[some   docs]: https://example.com/docs",
     );
 
-    expect(mainModule.urlForLink(editor, "some docs")).toBe("https://example.com/docs");
+    expect(await mainModule.urlForLink(editor, "some docs")).toBe("https://example.com/docs");
   });
 
   for (const [context, definition] of [
@@ -215,22 +215,22 @@ describe("link hyperclick provider", () => {
     });
   }
 
-  it("resolves the current destination synchronously while its syntax tree is pending", async () => {
+  it("waits for the current destination while its syntax tree is pending", async () => {
     const editor = await openEditor("[click][here]\n\n[here]: https://old.example");
     editor.setText('[click][here]\n\n[here]: <https://new.example/my docs> "New title"');
 
-    expect(mainModule.urlForLink(editor, "here")).toBe("https://new.example/my%20docs");
+    expect(await mainModule.urlForLink(editor, "here")).toBe("https://new.example/my%20docs");
   });
 
-  it("resolves destination escapes synchronously when syntax nodes are unavailable", async () => {
+  it("resolves destination escapes when syntax nodes are unavailable", async () => {
     const editor = await openEditor(String.raw`[click][here]
 
 [here]: https://example.com/a\(b\) "Documentation"`);
     spyOn(editor.getBuffer().getLanguageMode(), "getSyntaxNodeAtPosition").and.returnValue(null);
 
-    expect(mainModule.urlForLink(editor, "here")).toBe("https://example.com/a(b)");
-    expect(mainModule.urlForLink(editor, "missing")).toBeUndefined();
-    expect(mainModule.urlForLink(editor, "https://example.com/plain")).toBe(
+    expect(await mainModule.urlForLink(editor, "here")).toBe("https://example.com/a(b)");
+    expect(await mainModule.urlForLink(editor, "missing")).toBeUndefined();
+    expect(await mainModule.urlForLink(editor, "https://example.com/plain")).toBe(
       "https://example.com/plain",
     );
   });
@@ -263,7 +263,7 @@ describe("link hyperclick provider", () => {
     const editor = await openEditor("https://example.com");
     editor.setCursorBufferPosition([0, 9]);
 
-    lumine.commands.dispatch(editor.getElement(), "hyperclick:confirm-cursor");
+    await lumine.commands.dispatch(editor.getElement(), "hyperclick:confirm-cursor");
     await conditionPromise(() => lumine.shell.openExternal.calls.count() === 1);
 
     expect(lumine.shell.openExternal).toHaveBeenCalledOnceWith("https://example.com/");

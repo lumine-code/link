@@ -4,8 +4,9 @@ describe("link package", () => {
     await lumine.packages.activatePackage("language-gfm");
 
     const activationPromise = lumine.packages.activatePackage("link");
-    lumine.commands.dispatch(lumine.views.getView(lumine.workspace), "link:open");
-    await activationPromise;
+    await lumine.commands.dispatch(lumine.views.getView(lumine.workspace), "link:open");
+    const pack = await activationPromise;
+    spyOn(pack.mainModule, "openLink").and.callThrough();
   });
 
   describe("when opening a link from the context menu", () => {
@@ -35,6 +36,8 @@ describe("link package", () => {
       const element = editor.getElement();
       const component = element.getComponent();
       component.updateSync();
+      await editor.getBuffer().getLanguageMode().refresh?.();
+      component.updateSync();
       const screenPosition = editor.screenPositionForBufferPosition(bufferPosition);
       const pixelPosition = element.pixelPositionForBufferPosition(bufferPosition);
       const linesRect = component.refs.lineTiles.getBoundingClientRect();
@@ -50,8 +53,14 @@ describe("link package", () => {
       });
       const item = popup.rootList.items.find((item) => item.template.command === "link:open");
       expect(item).toBeDefined();
+      const openLink = lumine.packages.getActivePackage("link").mainModule.openLink;
+      const previousCalls = openLink.calls.count();
       item.element.click();
-      await Promise.resolve();
+      await conditionPromise(
+        () => openLink.calls.count() > previousCalls,
+        "context-menu command dispatch",
+      );
+      await openLink.calls.mostRecent().returnValue;
     }
 
     it("opens the clicked link while preserving a cursor elsewhere, then uses the cursor for commands", async () => {
@@ -68,7 +77,7 @@ describe("link package", () => {
       expect(editor.getCursorBufferPosition()).toEqual([2, 9]);
 
       lumine.shell.openExternal.calls.reset();
-      lumine.commands.dispatch(editor.getElement(), "link:open");
+      await lumine.commands.dispatch(editor.getElement(), "link:open");
       expect(lumine.shell.openExternal).toHaveBeenCalledOnceWith("https://example.com/");
     });
 
@@ -129,25 +138,25 @@ describe("link package", () => {
       await languageMode.atTransactionEnd();
 
       spyOn(lumine.shell, "openExternal");
-      lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
+      await lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
       expect(lumine.shell.openExternal).not.toHaveBeenCalled();
 
       editor.setCursorBufferPosition([0, 4]);
-      lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
+      await lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
 
       expect(lumine.shell.openExternal).toHaveBeenCalled();
       expect(lumine.shell.openExternal.calls.argsFor(0)[0]).toBe("http://github.com/");
 
       lumine.shell.openExternal.calls.reset();
       editor.setCursorBufferPosition([0, 8]);
-      lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
+      await lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
 
       expect(lumine.shell.openExternal).toHaveBeenCalled();
       expect(lumine.shell.openExternal.calls.argsFor(0)[0]).toBe("http://github.com/");
 
       lumine.shell.openExternal.calls.reset();
       editor.setCursorBufferPosition([0, 20]);
-      lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
+      await lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
 
       expect(lumine.shell.openExternal).toHaveBeenCalled();
       expect(lumine.shell.openExternal.calls.argsFor(0)[0]).toBe("http://github.com/");
@@ -178,18 +187,18 @@ you should not [click][her]
 
         spyOn(lumine.shell, "openExternal");
         editor.setCursorBufferPosition([0, 0]);
-        lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
+        await lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
         expect(lumine.shell.openExternal).not.toHaveBeenCalled();
 
         editor.setCursorBufferPosition([0, 19]);
-        lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
+        await lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
 
         expect(lumine.shell.openExternal).toHaveBeenCalled();
         expect(lumine.shell.openExternal.calls.argsFor(0)[0]).toBe("http://github.com/");
 
         lumine.shell.openExternal.calls.reset();
         editor.setCursorBufferPosition([1, 24]);
-        lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
+        await lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
 
         expect(lumine.shell.openExternal).not.toHaveBeenCalled();
       }));
@@ -201,11 +210,11 @@ you should not [click][her]
       editor.setText("// ftp://github.com\n");
 
       spyOn(lumine.shell, "openExternal");
-      lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
+      await lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
       expect(lumine.shell.openExternal).not.toHaveBeenCalled();
 
       editor.setCursorBufferPosition([0, 5]);
-      lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
+      await lumine.commands.dispatch(lumine.views.getView(editor), "link:open");
 
       expect(lumine.shell.openExternal).not.toHaveBeenCalled();
     });
