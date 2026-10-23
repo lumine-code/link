@@ -58,7 +58,13 @@ describe("Markdown file links", () => {
       "tree",
       targetPath,
     ],
-    ["absolute", `[integration](<${targetPath}>)`, "tree", targetPath],
+    [
+      "absolute",
+      // Quote native separators so Markdown does not read \_ as an escape.
+      `[integration](<${targetPath.replace(/\\/g, "\\\\")}>)`,
+      "tree",
+      targetPath,
+    ],
     ["file URL", `[draft](${pathToFileURL(encodedPath).href})`, "guide", encodedPath],
     ["file autolink", `<${pathToFileURL(encodedPath).href}>`, "guide", encodedPath],
   ]) {
