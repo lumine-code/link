@@ -30,6 +30,8 @@
   "specPackages": [
     "language-hyperlink",
     "language-gfm",
+    "language-ipython",
+    "language-python",
     "hyperclick"
   ],
   "scripts": {

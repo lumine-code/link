@@ -245,6 +245,38 @@ describe("link hyperclick provider", () => {
     expect(lumine.shell.openExternal).toHaveBeenCalledOnceWith("mailto:hello@example.com");
   });
 
+  for (const [kind, url, decoded] of [
+    [
+      "character references",
+      "https://example.com/?a=1&amp;b=2&copy;=3",
+      "https://example.com/?a=1&b=2%C2%A9=3",
+    ],
+    [
+      "backslash escapes",
+      String.raw`https://example.com/?find=\*value`,
+      "https://example.com/?find=*value",
+    ],
+  ]) {
+    it(`preserves literal ${kind} in bare URLs and angle autolinks`, async () => {
+      for (const text of [url, `<${url}>`]) {
+        const editor = await openEditor(text);
+        const suggestion = await query(editor, "example");
+        expect(suggestion).toBeDefined();
+        await suggestion.callback();
+        expect(lumine.shell.openExternal).toHaveBeenCalledOnceWith(url);
+        lumine.shell.openExternal.calls.reset();
+      }
+    });
+
+    it(`decodes ${kind} in an inline Markdown destination`, async () => {
+      const editor = await openEditor(`[site](${url})`);
+      const suggestion = await query(editor, "example");
+      expect(suggestion).toBeDefined();
+      await suggestion.callback();
+      expect(lumine.shell.openExternal).toHaveBeenCalledOnceWith(decoded);
+    });
+  }
+
   it("reports a browser failure through the existing link warning", async () => {
     const editor = await openEditor("https://example.com");
     const suggestion = await query(editor, "example");
