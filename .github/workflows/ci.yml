@@ -121,3 +121,14 @@ jobs:
           else
             npm start -- --test ../link/spec
           fi
+      - name: Run the Jasmine spec suite with worker syntax
+        working-directory: lumine
+        timeout-minutes: 20
+        env:
+          LUMINE_SYNTAX_EXECUTION: worker
+        run: |
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            xvfb-run --auto-servernum npm start -- --test ../link/spec
+          else
+            npm start -- --test ../link/spec
+          fi

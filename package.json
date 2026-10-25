@@ -32,6 +32,16 @@
     "language-gfm",
     "language-ipython",
     "language-python",
+    "language-latex",
+    "language-html",
+    "language-xml",
+    "language-javascript",
+    "language-json",
+    "language-shellscript",
+    "language-yaml",
+    "language-toml",
+    "language-css",
+    "language-typst",
     "hyperclick"
   ],
   "scripts": {
