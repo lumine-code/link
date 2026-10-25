@@ -5,6 +5,11 @@ const URL =
 const LINK_SCOPE = "markup.underline.link.hyperlink";
 
 describe("links in IPython strings", () => {
+  // Processing fixtures use a real grammar; None deliberately disables this package.
+  beforeEach(async () => {
+    await lumine.packages.activatePackage("language-text");
+  });
+
   let main, editor, popup;
 
   beforeEach(async () => {

@@ -361,6 +361,11 @@ const CASES = [
 ];
 
 describe("links across registered host grammars", () => {
+  // Processing fixtures use a real grammar; None deliberately disables this package.
+  beforeEach(async () => {
+    await lumine.packages.activatePackage("language-text");
+  });
+
   let main, editor;
 
   beforeEach(async () => {

@@ -4,6 +4,11 @@ const { Range } = require("lumine");
 const filePathForLink = require("../lib/file-link");
 
 describe("Markdown file links", () => {
+  // Processing fixtures use a real grammar; None deliberately disables this package.
+  beforeEach(async () => {
+    await lumine.packages.activatePackage("language-text");
+  });
+
   const sourcePath = path.join(__dirname, "fixtures", "source.md");
   const targetPath = path.join(__dirname, "fixtures", "text-buffer-tree-sitter.md");
   const encodedPath = path.join(__dirname, "fixtures", "more", "guide (draft)#1.md");

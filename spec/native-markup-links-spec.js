@@ -1,6 +1,11 @@
 const { Point, Range } = require("lumine");
 
 describe("native markup link boundaries", () => {
+  // Processing fixtures use a real grammar; None deliberately disables this package.
+  beforeEach(async () => {
+    await lumine.packages.activatePackage("language-text");
+  });
+
   let main, editor, popup;
 
   beforeEach(async () => {

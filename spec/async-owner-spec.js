@@ -2,6 +2,11 @@ const { Range } = require("lumine");
 const path = require("node:path");
 
 describe("Link requests across asynchronous changes", () => {
+  // Processing fixtures use a real grammar; None deliberately disables this package.
+  beforeEach(async () => {
+    await lumine.packages.activatePackage("language-text");
+  });
+
   let main, editor, release;
   const target = () => ({
     range: [

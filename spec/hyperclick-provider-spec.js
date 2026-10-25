@@ -1,6 +1,11 @@
 const { Range } = require("lumine");
 
 describe("link hyperclick provider", () => {
+  // Processing fixtures use a real grammar; None deliberately disables this package.
+  beforeEach(async () => {
+    await lumine.packages.activatePackage("language-text");
+  });
+
   let mainModule, hyperclick, provider;
 
   beforeEach(async () => {
