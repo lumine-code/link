@@ -30,6 +30,8 @@ Recognized HTTP(S) links open in the default browser, and `mailto:` links open i
 
 Markdown file links such as `[documentation](docs/guide.md)` open existing files in the editor. Relative paths start from the directory of the saved Markdown document; absolute paths and `file:///` URLs also work. URL-encoded filenames are decoded, and query strings and fragments are excluded from the filename. Missing files produce a warning instead of creating an empty file. A filename in ordinary prose or quotes is not treated as a link.
 
+Large-document lookups use immutable snapshots, bounded text reads and cooperative tree or source traversal. Markdown references remain owned by their enclosing document or injected cell. Complete reference labels are limited to 4,096 UTF-16 units and complete destinations to 65,536 units; oversized metadata is declined before materialization, never truncated into a different link. If an earlier definition has unreadable label metadata, lookup declines instead of choosing a potentially different duplicate. The source fallback preserves angle destinations, escapes and balanced parentheses while ignoring unneeded title text. Superseded requests stop before navigation.
+
 ## Services
 
 - `hyperclick.provider`: provided to Hyperclick to underline and follow recognized links.
