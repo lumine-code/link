@@ -105,20 +105,47 @@ describe("links in IPython strings", () => {
     await editor.languageMode.refresh?.();
     component.updateSync();
     const clickedPosition = position("pdf");
-    const screenPosition = editor.screenPositionForBufferPosition(clickedPosition);
+    let screenPosition, target, clientX, clientY;
+    await conditionPromise(() => {
+      editor.scrollToBufferPosition(clickedPosition, { mode: "nearest" });
+      component.updateSync();
+      const beforeMeasurement = editor.screenPositionForBufferPosition(clickedPosition);
+      const pixelPosition = element.pixelPositionForBufferPosition(clickedPosition);
+      screenPosition = editor.screenPositionForBufferPosition(clickedPosition);
+      // Pixel measurement may render a newly measured wrap width. Use one
+      // settled geometry for the painted token and the actual mouse hit test.
+      if (!screenPosition.isEqual(beforeMeasurement)) return false;
+      target = component.refs.lineTiles.querySelector(
+        `[data-screen-row="${screenPosition.row}"]:not([data-off-screen]) .syntax--markup.syntax--underline.syntax--link`,
+      );
+      const linesRect = component.refs.lineTiles.getBoundingClientRect();
+      const viewport = component.refs.scrollContainer.getBoundingClientRect();
+      clientX =
+        linesRect.left +
+        pixelPosition.left -
+        (component.renderOriginLeft || 0) +
+        component.getBaseCharacterWidth() * 0.2;
+      clientY =
+        linesRect.top +
+        pixelPosition.top -
+        component.renderOriginTop +
+        component.getLineHeight() / 2;
+      return (
+        target &&
+        clientX >= viewport.left &&
+        clientX < viewport.right &&
+        clientY >= viewport.top &&
+        clientY < viewport.bottom
+      );
+    }, "wrapped URL is painted at its current visible position");
     expect(screenPosition.row).toBeGreaterThan(
       editor.screenPositionForBufferPosition(urlRange().start).row,
-    );
-    const pixelPosition = element.pixelPositionForBufferPosition(clickedPosition);
-    const linesRect = component.refs.lineTiles.getBoundingClientRect();
-    const target = element.querySelector(
-      `[data-screen-row="${screenPosition.row}"] .syntax--markup.syntax--underline.syntax--link`,
     );
     expect(target).not.toBeNull();
     popup = lumine.contextMenu.showForEvent({
       target,
-      clientX: linesRect.left + pixelPosition.left + component.getBaseCharacterWidth() * 0.2,
-      clientY: linesRect.top + pixelPosition.top + component.getLineHeight() / 2,
+      clientX,
+      clientY,
     });
     const item = popup.rootList.items.find((item) => item.template.command === "link:open");
     expect(item).toBeDefined();
